@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands, tasks
 import os
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 import logging
 import asyncio
@@ -101,11 +101,11 @@ async def bot_status(ctx):
     embed = discord.Embed(
         title="🤖 FoE Rally Bot Status",
         color=discord.Color.blue(),
-        timestamp=datetime.utcnow()
+        timestamp=datetime.now(timezone.utc)
     )
     embed.add_field(name="Announcements", value=status_text, inline=True)
     embed.add_field(name="Announcement Channel", value=channel_info, inline=True)
-    embed.add_field(name="Next Announcement", value="Every minute (TEST MODE)", inline=False)
+    embed.add_field(name="Next Announcement", value="3 minutes before the next hour", inline=False)
     embed.add_field(name="Available Messages", value=f"{len(ANNOUNCEMENT_MESSAGES)} different messages", inline=True)
     
     await ctx.send(embed=embed)
@@ -118,20 +118,18 @@ async def announcement_scheduler():
     if not announcements_enabled or announcement_channel_id is None:
         return
     
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     
-    # TEST MODE: Send announcement every minute
-    # For production, uncomment the line below and comment out the current logic
-    # if now.minute == 57:  # 3 minutes before the hour
-    
-    channel = bot.get_channel(announcement_channel_id)
-    if channel:
-        message = random.choice(ANNOUNCEMENT_MESSAGES)
-        try:
-            await channel.send(f'⚔️ **RALLY CALL:** {message}')
-            print(f'TEST ANNOUNCEMENT sent at {now.strftime("%H:%M:%S")}: {message}')
-        except Exception as e:
-            print(f'Error sending announcement: {e}')
+    # Check if it's 3 minutes before the hour (57 minutes past the hour)
+    if now.minute == 57:
+        channel = bot.get_channel(announcement_channel_id)
+        if channel:
+            message = random.choice(ANNOUNCEMENT_MESSAGES)
+            try:
+                await channel.send(f'⚔️ **RALLY CALL:** {message}')
+                print(f'Announcement sent at {now.strftime("%H:%M:%S")}: {message}')
+            except Exception as e:
+                print(f'Error sending announcement: {e}')
 
 @announcement_scheduler.before_loop
 async def before_announcement_scheduler():
