@@ -9,6 +9,9 @@ pip install -r requirements.txt
 
 https://discord.com/oauth2/authorize?client_id=1408464891395702907&permissions=2815076453542992&integration_type=0&scope=bot
 
+source venv/bin/activate
+nohup python main.py > bot.log 2>&1 &
+
 
 !setchannel general (Set the channel where announcements will be posted)
 !test (Check if the bot is working correctly)
