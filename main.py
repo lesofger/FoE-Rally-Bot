@@ -126,7 +126,7 @@ async def announcement_scheduler():
         if channel:
             message = random.choice(ANNOUNCEMENT_MESSAGES)
             try:
-                await channel.send(f'⚔️ **RALLY CALL:** {message}')
+                await channel.send(f'@everyone ⚔️ **RALLY CALL:** {message}')
                 print(f'Announcement sent at {now.strftime("%H:%M:%S")}: {message}')
             except Exception as e:
                 print(f'Error sending announcement: {e}')
